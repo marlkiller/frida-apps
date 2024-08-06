@@ -2,6 +2,7 @@
 // frida -u -X nsurl.js Surge
 
 if (ObjC.available) {
+    // 拦截 dataTaskWithRequest
     // Intercept the NSURLSession's dataTaskWithRequest:completionHandler: method
     // var NSURLSession = ObjC.classes.NSURLSession;
     // var dataTaskWithRequest = NSURLSession['- dataTaskWithRequest:completionHandler:'];
@@ -81,35 +82,77 @@ if (ObjC.available) {
     // });
 
 
-    var method = ObjC.classes.SGDNSPacket['+ queryPacketWithDomain:identifier:queryType:'];
-    var origImp = method.implementation;
-    // 基地址和偏移量
-    var baseAddr = Module.findBaseAddress("Surge");
-    var offset = 0x737000;
-    var addrFlag = baseAddr.add(offset);
-
-    method.implementation = ObjC.implement(method, function (self, sel, domain, identifier, queryType) {
-
-        var domainStr = ObjC.Object(domain).toString();
-
-        if (domainStr === 'captive.apple.com') {
-            console.log('domain detected: captive.apple.com');
-
-            // Memory.writeByteArray(addrFlag,[0x1]);
-            var valueBefore = Memory.readPointer(addrFlag);
-            console.log('Pointer value before: ' + valueBefore);
-
-            var result = origImp(self, sel, domain, identifier, queryType)
-
-            var valueAfter = Memory.readPointer(addrFlag);
-            console.log('Pointer value after: ' + valueAfter);
-
-            return result;
-        }
-
-        return origImp(self, sel, domain, identifier, queryType);
-    });
+    // 判断替换方法
+    // var method = ObjC.classes.SGDNSPacket['+ queryPacketWithDomain:identifier:queryType:'];
+    // var origImp = method.implementation;
+    // // 基地址和偏移量
+    // var baseAddr = Module.findBaseAddress("Surge");
+    // var offset = 0x737000;
+    // var addrFlag = baseAddr.add(offset);
+    //
+    // method.implementation = ObjC.implement(method, function (self, sel, domain, identifier, queryType) {
+    //
+    //     var domainStr = ObjC.Object(domain).toString();
+    //
+    //     if (domainStr === 'captive.apple.com') {
+    //         console.log('domain detected: captive.apple.com');
+    //
+    //         // Memory.writeByteArray(addrFlag,[0x1]);
+    //         var valueBefore = Memory.readPointer(addrFlag);
+    //         console.log('Pointer value before: ' + valueBefore);
+    //
+    //         var result = origImp(self, sel, domain, identifier, queryType)
+    //
+    //         var valueAfter = Memory.readPointer(addrFlag);
+    //         console.log('Pointer value after: ' + valueAfter);
+    //         return result;
+    //     }
+    //
+    //     return origImp(self, sel, domain, identifier, queryType);
+    // });
 
 } else {
     console.log('Objective-C Runtime is not available!');
 }
+
+
+// Hook dlsym
+Interceptor.attach(Module.findExportByName(null, 'dlsym'), {
+    onEnter: function (args) {
+        this.handle = args[0];
+        this.symbol = args[1].readCString();
+
+        // 判断符号名称是否以 "Sec" 前缀开头
+        if (this.symbol.startsWith('Sec')) {
+            this.shouldLog = true; // 设置标志，以便在 onLeave 中输出
+            // console.log('dlsym called');
+            // console.log('Handle: ' + this.handle);
+            // console.log('Symbol: ' + this.symbol);
+        } else {
+            this.shouldLog = false;
+        }
+    },
+    onLeave: function (retval) {
+        // 仅在符号名称以 "Sec" 前缀开头时输出返回值
+        if (this.shouldLog) {
+            // console.log('Address: ' + retval);
+            // 尝试解析返回值的符号信息
+            var symbolInfo = DebugSymbol.fromAddress(retval);
+            // console.log('Return Value Symbol Info: ' + JSON.stringify(symbolInfo));
+
+
+            var symbolName = this.symbol;
+            // 设置 hook 到获取到的符号地址
+            Interceptor.attach(retval, {
+                onEnter: function (args) {
+                    console.log('Entering ' + symbolName);
+                },
+                onLeave: function (retval) {
+                    console.log('Leaving ' + symbolName);
+                    console.log('Return Value: ' + retval);
+                }
+            });
+        }
+    }
+});
+
