@@ -12,7 +12,7 @@ def on_message(message, data):
 
 
 # 加载JavaScript脚本
-with open('nsurl.js', 'r') as f:
+with open('hook.js', 'r', encoding="utf-8") as f:
     script_code = f.read()
 
 # 连接到目标进程,attach传入进程名称（字符串）或者进程号（整数）
