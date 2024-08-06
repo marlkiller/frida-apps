@@ -198,44 +198,71 @@ function bufferToHex(buffer) {
     return hex;
 }
 
-var out;
-var outLen;
-Interceptor.attach(Module.findExportByName(null, 'CCCrypt'), {
-       onEnter: function(args) {
-        var valuein = '';
-        try {
-            valuein = Memory.readUtf8String(args[6]);
-        } catch (error) {
-            var dataLength = args[7].toInt32();
-            valuein = base64(Memory.readByteArray(args[6], dataLength));
-        }
 
 
-        console.log('Value In: ' + valuein);
-        var key = Memory.readByteArray(args[3], 32);
-        console.log('Key: ' + base64(key));
-        var iv = Memory.readByteArray(args[5], 16);
-        console.log('IV: ' + base64(iv));
-        // 打印 key 和 iv 的十六进制值
-        console.log('Key (hex): ' + bufferToHex(key));
-        console.log('IV (hex): ' + bufferToHex(iv));
-
-        out = args[8];
-        outLen = args[9];
-
-    },
-
-    onLeave: function(retval) {
-        var valueout = '';
-        try {
-            var dataOutBuffer = Memory.readByteArray(out, outLen.toInt32());
-            console.log('Data Out (hex): ' + bufferToHex(dataOutBuffer));
-            valueout = Memory.readUtf8String(out);
-        } catch (error) {
-            var dataLength = outLen.toInt32();
-            valueout = base64(Memory.readByteArray(out, dataLength));
-        }
-        console.log('Value Out: ' + valueout);
-        console.log('\n');
-    }
-});
+// hook CCCrypt
+// var out;
+// var outLen;
+//
+// Interceptor.attach(Module.findExportByName(null, 'CCCrypt'), {
+//        onEnter: function(args) {
+//         var valuein = '';
+//         try {
+//             valuein = Memory.readUtf8String(args[6]);
+//         } catch (error) {
+//             var dataLength = args[7].toInt32();
+//             valuein = base64(Memory.readByteArray(args[6], dataLength));
+//         }
+//
+//
+//         console.log('Value In: ' + valuein);
+//         var key = Memory.readByteArray(args[3], 32);
+//         console.log('Key: ' + base64(key));
+//         var iv = Memory.readByteArray(args[5], 16);
+//         console.log('IV: ' + base64(iv));
+//         // 打印 key 和 iv 的十六进制值
+//         console.log('Key (hex): ' + bufferToHex(key));
+//         console.log('IV (hex): ' + bufferToHex(iv));
+//
+//         out = args[8];
+//         outLen = args[9];
+//
+//     },
+//
+//     onLeave: function(retval) {
+//         var valueout = '';
+//         try {
+//             var dataOutBuffer = Memory.readByteArray(out, outLen.toInt32());
+//             console.log('Data Out (hex): ' + bufferToHex(dataOutBuffer));
+//             valueout = Memory.readUtf8String(out);
+//         } catch (error) {
+//             var dataLength = outLen.toInt32();
+//             valueout = base64(Memory.readByteArray(out, dataLength));
+//         }
+//         console.log('Value Out: ' + valueout);
+//         console.log('\n');
+//     }
+// });
+//
+// Interceptor.attach(Module.findExportByName(null, 'CCCrypt'), {
+//   onEnter: function (args) {
+//     console.log("[+] CCCrypt function called");
+//     console.log("[+] CCOperation: " + args[0].toInt32());
+//     console.log("[+] CCAlgorithm: " + args[1].toInt32());
+//     console.log("[+] CCOptions: " + args[2].toInt32());
+//     console.log("[+] key: " + hexdump(ptr(args[3]), { length: args[4].toInt32() }));
+//     console.log("[+] keyLength: " + args[4].toInt32());
+//     if (!args[5].isNull()) {
+//       console.log("[+] iv: " + hexdump(ptr(args[5]), { length: 16 }));
+//     }else{
+//       console.log("[+] iv: 0x0");
+//     }
+//     console.log("[+] dataIn: \n" + hexdump(ptr(args[6]), { length: args[7].toInt32() }));
+//     console.log("[+] dataInLength: " + args[7].toInt32());
+//     this.dataOutPtr = args[8];
+//     this.dataOutLengthPtr = args[10];
+//   },
+//   onLeave: function (retval) {
+//     console.log("[+] dataOut: \n" + hexdump(ptr(this.dataOutPtr), { length: ptr(this.dataOutLengthPtr).readUInt() }));
+//   }
+// });
