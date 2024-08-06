@@ -1,3 +1,6 @@
+
+console.log("java status:", Java.available) // True
+
 Java.perform(function () {
     // 遍历方法
     Java.use('类名').class.getDeclaredMethods().forEach(function (method) {
