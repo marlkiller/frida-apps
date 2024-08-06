@@ -3,60 +3,112 @@
 
 if (ObjC.available) {
     // Intercept the NSURLSession's dataTaskWithRequest:completionHandler: method
-    var NSURLSession = ObjC.classes.NSURLSession;
-    var dataTaskWithRequest = NSURLSession['- dataTaskWithRequest:completionHandler:'];
-    Interceptor.attach(dataTaskWithRequest.implementation, {
-        onEnter: function (args) {
-            // Save the request
-            this.request = new ObjC.Object(args[2]);
-            console.log('Request: ' + this.request);
-            var url = this.request?this.request.toString():"null"
+    // var NSURLSession = ObjC.classes.NSURLSession;
+    // var dataTaskWithRequest = NSURLSession['- dataTaskWithRequest:completionHandler:'];
+    // Interceptor.attach(dataTaskWithRequest.implementation, {
+    //     onEnter: function (args) {
+    //         this.request = new ObjC.Object(args[2]);
+    //
+    //         var url = this.request.URL().absoluteString();
+    //         var headers = this.request.allHTTPHeaderFields();
+    //         var headersString = headers ? JSON.stringify(headers) : 'null';
+    //
+    //         var body = this.request.HTTPBody();
+    //         var bodyString = body ? ObjC.classes.NSString.alloc().initWithData_encoding_(body, 4).toString() : 'null';
+    //
+    //         this.completionHandler = new ObjC.Block(args[3]);
+    //         var block = this.completionHandler;
+    //         var handler = block.implementation;
+    //         block.implementation = function (data, response, error) {
+    //             // Get the response data
+    //             var responseString = data ? ObjC.classes.NSString.alloc().initWithData_encoding_(data, 4).toString() : 'null';
+    //             console.log(`\n--- Network Request ---\n` +
+    //                         `URL: ${url}\n` +
+    //                         `Headers: ${headersString}\n` +
+    //                         `Body: ${bodyString}\n` +
+    //                         `Response: ${responseString}\n` +
+    //                         `-----------------------\n`);
+    //             // Call the original completion handler
+    //             return handler(data, response, error);
+    //         };
+    //     }
+    // });
 
-            // Save the completion handler block
-            this.completionHandler = new ObjC.Block(args[3]);
-            var block = this.completionHandler;
-            var handler = block.implementation;
-            block.implementation = function (data, response, error) {
-                // Print response data
-                if (data) {
-                    var dataString = ObjC.classes.NSString.alloc().initWithData_encoding_(data, 4); // 4 = NSUTF8StringEncoding
-                    console.log(url + '>>> Response Data: ' + dataString.toString());
-                }
-                // Call original completion handler
-                return handler(data, response, error);
-            };
+
+    // Interceptor.attach(ObjC.classes.SGDNSPacket['+ queryPacketWithDomain:identifier:queryType:'].implementation, {
+    //     onEnter: function (args) {
+    //         // args[0] 是 self（SGDNSPacket 对象）
+    //         // args[1] 是 _cmd（选择子）
+    //         // args[2] 是 domain 参数
+    //         // args[3] 是 identifier 参数
+    //         // args[4] 是 queryType 参数
+    //
+    //         var domain = ObjC.Object(args[2]).toString();
+    //         // 检查 domain 是否匹配
+    //         if (domain === 'captive.apple.com') {
+    //             console.log('queryPacketWithDomain:identifier:queryType: called');
+    //             console.log('Domain: ' + domain);
+    //             console.log('Identifier: ' + args[3].toInt32());
+    //             console.log('Query Type: ' + args[4].toInt32());
+    //             // 打印调用堆栈
+    //             var backtrace = Thread.backtrace(this.context, Backtracer.ACCURATE)
+    //                 .map(DebugSymbol.fromAddress)
+    //                 .join('\n');
+    //             console.log('Call Stack:\n' + backtrace);
+    //         }
+    //     },
+    //     onLeave: function (retval) {
+    //         // 输出 retval 的内容
+    //         var retvalType = typeof retval;
+    //         // 打印 retval 的值，根据其类型进行适当的转换
+    //         if (retvalType === 'object') {
+    //             // 如果 retval 是对象（例如指针），可以进一步检查
+    //             if (retval.isNull()) {
+    //                 console.log('Return Value is null');
+    //             } else {
+    //                 var obj = ObjC.Object(retval);
+    //                 // 获取对象的类信息
+    //                 // var cls = obj.$class;
+    //                 // var className = cls.$className;
+    //                 console.log('Return Value (Object): ' + obj.toString());
+    //             }
+    //         } else if (retvalType === 'number') {
+    //             console.log('Return Value (Number): ' + retval.toInt32());
+    //         } else {
+    //             console.log('Return Value: ' + retval.toString());
+    //         }
+    //     }
+    // });
+
+
+    var method = ObjC.classes.SGDNSPacket['+ queryPacketWithDomain:identifier:queryType:'];
+    var origImp = method.implementation;
+    // 基地址和偏移量
+    var baseAddr = Module.findBaseAddress("Surge");
+    var offset = 0x737000;
+    var addrFlag = baseAddr.add(offset);
+
+    method.implementation = ObjC.implement(method, function (self, sel, domain, identifier, queryType) {
+
+        var domainStr = ObjC.Object(domain).toString();
+
+        if (domainStr === 'captive.apple.com') {
+            console.log('domain detected: captive.apple.com');
+
+            // Memory.writeByteArray(addrFlag,[0x1]);
+            var valueBefore = Memory.readPointer(addrFlag);
+            console.log('Pointer value before: ' + valueBefore);
+
+            var result = origImp(self, sel, domain, identifier, queryType)
+
+            var valueAfter = Memory.readPointer(addrFlag);
+            console.log('Pointer value after: ' + valueAfter);
+
+            return result;
         }
+
+        return origImp(self, sel, domain, identifier, queryType);
     });
-
-    Interceptor.attach(dataTaskWithRequest.implementation, {
-        onEnter: function (args) {
-            this.request = new ObjC.Object(args[2]);
-
-            var url = this.request.URL().absoluteString();
-            var headers = this.request.allHTTPHeaderFields();
-            var headersString = headers ? JSON.stringify(headers) : 'null';
-
-            var body = this.request.HTTPBody();
-            var bodyString = body ? ObjC.classes.NSString.alloc().initWithData_encoding_(body, 4).toString() : 'null';
-
-            this.completionHandler = new ObjC.Block(args[3]);
-            var block = this.completionHandler;
-            var handler = block.implementation;
-            block.implementation = function (data, response, error) {
-                // Get the response data
-                var responseString = data ? ObjC.classes.NSString.alloc().initWithData_encoding_(data, 4).toString() : 'null';
-                console.log(`\n--- Network Request ---\n` +
-                            `URL: ${url}\n` +
-                            `Headers: ${headersString}\n` +
-                            `Body: ${bodyString}\n` +
-                            `Response: ${responseString}\n` +
-                            `-----------------------\n`);
-                // Call the original completion handler
-                return handler(data, response, error);
-            };
-        }
-    });
-
 
 } else {
     console.log('Objective-C Runtime is not available!');

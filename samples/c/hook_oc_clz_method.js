@@ -130,7 +130,7 @@ onEnter(log, args, state) {
   }
 }
 
-// 打印调用栈
+// 打印调用栈 堆栈
 {
   onEnter(log, args, state) {
     var url = new ObjC.Object(args[2]);
