@@ -115,44 +115,53 @@ if (ObjC.available) {
     console.log('Objective-C Runtime is not available!');
 }
 
-
-// Hook dlsym
-Interceptor.attach(Module.findExportByName(null, 'dlsym'), {
-    onEnter: function (args) {
-        this.handle = args[0];
-        this.symbol = args[1].readCString();
-
-        // 判断符号名称是否以 "Sec" 前缀开头
-        if (this.symbol.startsWith('Sec')) {
-            this.shouldLog = true; // 设置标志，以便在 onLeave 中输出
-            // console.log('dlsym called');
-            // console.log('Handle: ' + this.handle);
-            // console.log('Symbol: ' + this.symbol);
-        } else {
-            this.shouldLog = false;
-        }
-    },
-    onLeave: function (retval) {
-        // 仅在符号名称以 "Sec" 前缀开头时输出返回值
-        if (this.shouldLog) {
-            // console.log('Address: ' + retval);
-            // 尝试解析返回值的符号信息
-            var symbolInfo = DebugSymbol.fromAddress(retval);
-            // console.log('Return Value Symbol Info: ' + JSON.stringify(symbolInfo));
-
-
-            var symbolName = this.symbol;
-            // 设置 hook 到获取到的符号地址
-            Interceptor.attach(retval, {
-                onEnter: function (args) {
-                    console.log('Entering ' + symbolName);
-                },
-                onLeave: function (retval) {
-                    console.log('Leaving ' + symbolName);
-                    console.log('Return Value: ' + retval);
-                }
-            });
-        }
-    }
-});
+//
+// // Hook dlsym
+// Interceptor.attach(Module.findExportByName(null, 'dlsym'), {
+//     onEnter: function (args) {
+//         this.handle = args[0];
+//         this.symbol = args[1].readCString();
+//
+//         // 判断符号名称是否以 "Sec" 前缀开头
+//         if (this.symbol.startsWith('Sec')) {
+//             this.shouldLog = true; // 设置标志，以便在 onLeave 中输出
+//             // console.log('dlsym called');
+//             // console.log('Handle: ' + this.handle);
+//             // console.log('Symbol: ' + this.symbol);
+//         } else {
+//             this.shouldLog = false;
+//         }
+//     },
+//     onLeave: function (retval) {
+//         // 仅在符号名称以 "Sec" 前缀开头时输出返回值
+//         if (this.shouldLog) {
+//             // console.log('Address: ' + retval);
+//             // 尝试解析返回值的符号信息
+//             var symbolInfo = DebugSymbol.fromAddress(retval);
+//             // console.log('Return Value Symbol Info: ' + JSON.stringify(symbolInfo));
+//
+//             var symbolName = this.symbol;
+//             // 设置 hook 到获取到的符号地址
+//             Interceptor.attach(retval, {
+//                 onEnter: function (args) {
+//                     console.log('Entering ' + symbolName);
+//                     this.aaa=args;
+//                 },
+//                 onLeave: function (retval) {
+//                     console.log('Leaving ' + symbolName);
+//                     console.log('Return Value: ' + retval);
+//
+//                     if (retval.toInt32() === 0x22000021) {
+//                         retval.replace(ptr('0x22014221'));
+//                         console.log('Return Value: ' + retval);
+//                     }
+//                     if (symbolName === 'SecStaticCodeCheckValidity') {
+//                         retval.replace(ptr('0x0')); // 修改返回值为 0
+//                         console.log('Modified return value for SecStaticCodeCheckValidity: 0');
+//                     }
+//                 }
+//             });
+//         }
+//     }
+// });
 
