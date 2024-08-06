@@ -12,5 +12,6 @@ method.implementation = ObjC.implement(method, function  (self, sel, url){
         return origImp(self, sel, newUrl);
       }
       // console.log(">>> : " + url_str);
+      // 调用原方法，如果不调用则原方法得不到执行
       return origImp(self, sel, url);
 });

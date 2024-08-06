@@ -67,6 +67,11 @@ onEnter(log, args, state) {
     var after = new ObjC.Object(retval); // 打印出来是个指针时，请用该方式转换后再打印
     log(`before:=${retval}=`);
     log(`after:=${after}=`);
+
+    // 用整数1337替换返回值
+    // retval.replace(1337)
+    // 用指针替换
+    // retval.replace(ptr("0x1234"))
   }
 }
 
@@ -137,3 +142,30 @@ onEnter(log, args, state) {
   onLeave(log, retval, state) {
   }
 }
+
+
+// 远程调用
+@implementation coreClass
+- (NSString*)decrypt:(NSString*)str :(NSString*)key{
+    NSLog(@"str: %@", str);
+    NSLog(@"key: %@", key);
+    return @"decrypt successed!";
+}
+@end
+function decrypt(inputstr, inputkey){
+    var coreClass = ObjC.classes.coreClass.alloc();
+    var str = ObjC.classes.NSString.stringWithString_(inputstr);
+    var key = ObjC.classes.NSString.stringWithString_(inputkey);
+    var decryptString = coreClass['- decrypt::'].call(coreClass, str, key);
+    console.log("decryptString: " + decryptString);
+    console.log("--------------------");
+}
+decrypt("123", "456");
+rpc.exports = {
+    decrypt: function(inputstr, inputkey) {
+        decrypt(inputstr, inputkey);
+    }
+};
+if __name__ == '__main__':
+     rpc = script.exports
+     rpc.decrypt("123", "456")
