@@ -268,14 +268,51 @@ function bufferToHex(buffer) {
 //   }
 // });
 
-function readMemory() {
-    try {
-        var tmp_addr = baseAddr.add(0x871750);
-        const value = Memory.readPointer(tmp_addr); // 假设要读取 32 位无符号整数
-        console.log('Value at address', tmp_addr, ':', value);
-    } catch (e) {
-        console.error('Failed to read memory:', e);
-    }
+// function readMemory() {
+//     try {
+//         var tmp_addr = baseAddr.add(0x737d98);
+//         const value = Memory.readPointer(tmp_addr); // 假设要读取 32 位无符号整数
+//         console.log('Value at address', tmp_addr, ':', value);
+//     } catch (e) {
+//         console.error('Failed to read memory:', e);
+//     }
+// }
+//  // 每隔 5 秒读取一次内存
+// setInterval(readMemory, 500);
+
+
+function get_func_addr(module, offset) {
+   var base_addr = Module.findBaseAddress(module);
+   // console.log("base_addr: " + base_addr);
+   // console.log(hexdump(ptr(base_addr), {
+   //          length: 16,
+   //          header: true,
+   //          ansi: true
+   //      }))
+   var func_addr = base_addr.add(offset);
+   if (Process.arch == 'arm')
+      return func_addr.add(1);  //如果是32位地址+1
+   else
+      return func_addr;
 }
- // 每隔 5 秒读取一次内存
-setInterval(readMemory, 5000);
+
+
+var cap1 = get_func_addr('Surge', 0xf478);
+Interceptor.attach(ptr(cap1), {
+   onEnter: function(args) {
+      console.log("cap1 onEnter");
+   },
+   onLeave: function(retval) {
+      console.log("cap1 onLeave");
+   }
+});
+
+var cap2 = get_func_addr('Surge', 0x142e8);
+Interceptor.attach(ptr(cap2), {
+   onEnter: function(args) {
+      console.log("cap2 onEnter");
+   },
+   onLeave: function(retval) {
+      console.log("cap2 onLeave");
+   }
+});
