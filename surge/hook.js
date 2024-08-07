@@ -112,6 +112,36 @@ if (ObjC.available) {
     //     return origImp(self, sel, domain, identifier, queryType);
     // });
 
+
+    // 挂钩 SGDNSPacket 类的 -answer 方法
+    // var SGDNSPacket = ObjC.classes.SGDNSPacket;
+    // var method = SGDNSPacket['- answer'];
+    //
+    // Interceptor.attach(method.implementation, {
+    //     onEnter: function (args) {
+    //         // 输出 self 的信息
+    //         var self = new ObjC.Object(args[0]);
+    //         console.log('self: ' + self);
+    //
+    //         // 遍历 self 的属性
+    //         var props = self.$ownMethods;
+    //         console.log('self properties: ' + props.join(', '));
+    //     },
+    //     onLeave: function (retval) {
+    //         if (retval.isNull()) {
+    //             console.log("answer returned null");
+    //             return;
+    //         }
+    //         // 遍历 NSArray 的代码如下：
+    //         var array = new ObjC.Object(retval);
+    //         var count = array.count().valueOf();
+    //         for (var i = 0; i !== count; i++) {
+    //           var element = array.objectAtIndex_(i);
+    //           console.log(element);
+    //         }
+    //     }
+    // });
+
 } else {
     console.log('Objective-C Runtime is not available!');
 }
@@ -200,7 +230,6 @@ function bufferToHex(buffer) {
 }
 
 
-
 // hook CCCrypt
 // var out;
 // var outLen;
@@ -268,51 +297,83 @@ function bufferToHex(buffer) {
 //   }
 // });
 
-// function readMemory() {
-//     try {
-//         var tmp_addr = baseAddr.add(0x737d98);
-//         const value = Memory.readPointer(tmp_addr); // 假设要读取 32 位无符号整数
-//         console.log('Value at address', tmp_addr, ':', value);
-//     } catch (e) {
-//         console.error('Failed to read memory:', e);
-//     }
-// }
+function readMemory() {
+    try {
+        var tmp_addr = baseAddr.add(0x737d98);
+        const value = Memory.readPointer(tmp_addr); // 假设要读取 32 位无符号整数
+        console.log('Value at address', tmp_addr, ':', value);
+    } catch (e) {
+        console.error('Failed to read memory:', e);
+    }
+}
+
 //  // 每隔 5 秒读取一次内存
 // setInterval(readMemory, 500);
 
 
 function get_func_addr(module, offset) {
-   var base_addr = Module.findBaseAddress(module);
-   // console.log("base_addr: " + base_addr);
-   // console.log(hexdump(ptr(base_addr), {
-   //          length: 16,
-   //          header: true,
-   //          ansi: true
-   //      }))
-   var func_addr = base_addr.add(offset);
-   if (Process.arch == 'arm')
-      return func_addr.add(1);  //如果是32位地址+1
-   else
-      return func_addr;
+    var base_addr = Module.findBaseAddress(module);
+    // console.log("base_addr: " + base_addr);
+    // console.log(hexdump(ptr(base_addr), {
+    //          length: 16,
+    //          header: true,
+    //          ansi: true
+    //      }))
+    var func_addr = base_addr.add(offset);
+    if (Process.arch == 'arm')
+        return func_addr.add(1);  //如果是32位地址+1
+    else
+        return func_addr;
 }
 
+// hook subxx 方法
+// var cap1 = get_func_addr('Surge', 0xf478);
+// Interceptor.attach(ptr(cap1), {
+//    onEnter: function(args) {
+//       console.log("cap1 onEnter");
+//       readMemory();
+//    },
+//    onLeave: function(retval) {
+//       console.log("cap1 onLeave");
+//       readMemory();
+//    }
+// });
+//
+// var cap2 = get_func_addr('Surge', 0x142e8);
+// Interceptor.attach(ptr(cap2), {
+//    onEnter: function(args) {
+//       console.log("cap2 onEnter");
+//       readMemory();
+//    },
+//    onLeave: function(retval) {
+//       console.log("cap2 onLeave");
+//       readMemory();
+//    }
+// });
 
-var cap1 = get_func_addr('Surge', 0xf478);
-Interceptor.attach(ptr(cap1), {
-   onEnter: function(args) {
-      console.log("cap1 onEnter");
-   },
-   onLeave: function(retval) {
-      console.log("cap1 onLeave");
-   }
+
+
+// 目标地址
+Interceptor.attach(ptr(get_func_addr('Surge', 0xf714)), {
+    onEnter: function (args) {
+        // 打印寄存器 w25 和 w20 的值
+        console.log('1 w25:', this.context.regs.w25.toString());
+        console.log('1 w20:', this.context.regs.w20.toString());
+    },
+    onLeave: function (retval) {
+        // 可以在这里处理返回值，如果需要的话
+    }
 });
 
-var cap2 = get_func_addr('Surge', 0x142e8);
-Interceptor.attach(ptr(cap2), {
-   onEnter: function(args) {
-      console.log("cap2 onEnter");
-   },
-   onLeave: function(retval) {
-      console.log("cap2 onLeave");
-   }
+// 0000000100014584         cmp        w25, w20
+// 0000000100014588         b.ne       loc_100014604
+Interceptor.attach(ptr(get_func_addr('Surge', 0x14584)), {
+    onEnter: function (args) {
+        // 打印寄存器 w25 和 w20 的值
+        console.log('2 w25:', this.context.regs.w25.toString());
+        console.log('2 w20:', this.context.regs.w20.toString());
+    },
+    onLeave: function (retval) {
+        // 可以在这里处理返回值，如果需要的话
+    }
 });
