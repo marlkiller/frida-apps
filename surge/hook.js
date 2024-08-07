@@ -1,6 +1,8 @@
 // frida -n Surge -S nsurl.js
 // frida -u -X nsurl.js Surge
 
+var baseAddr = Module.findBaseAddress("Surge");
+
 if (ObjC.available) {
     // 拦截 dataTaskWithRequest
     // Intercept the NSURLSession's dataTaskWithRequest:completionHandler: method
@@ -86,7 +88,6 @@ if (ObjC.available) {
     // var method = ObjC.classes.SGDNSPacket['+ queryPacketWithDomain:identifier:queryType:'];
     // var origImp = method.implementation;
     // // 基地址和偏移量
-    // var baseAddr = Module.findBaseAddress("Surge");
     // var offset = 0x737000;
     // var addrFlag = baseAddr.add(offset);
     //
@@ -165,3 +166,15 @@ if (ObjC.available) {
 //     }
 // });
 
+
+function readMemory() {
+    try {
+        var tmp_addr = baseAddr.add(0x871750);
+        const value = Memory.readPointer(tmp_addr); // 假设要读取 32 位无符号整数
+        console.log('Value at address', tmp_addr, ':', value);
+    } catch (e) {
+        console.error('Failed to read memory:', e);
+    }
+}
+ // 每隔 5 秒读取一次内存
+setInterval(readMemory, 5000);
