@@ -1,0 +1,93 @@
+Leaving SecCodeCopySelf
+Return Value: 0x0
+Leaving SecCodeCopyPath
+Return Value: 0x0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x6000001b45f0
+Leaving SecTaskGetCodeSignStatus
+Return Value: 0x22014221
+Leaving SecTaskCopySigningIdentifier
+Return Value: 0x600002c0af70
+Leaving SecTaskCreateFromSelf
+Return Value: 0x6000001b5d10
+Leaving SecTaskCreateFromSelf
+Return Value: 0x6000001b5d10
+Leaving SecTaskGetCodeSignStatus
+Return Value: 0x22014221
+Leaving SecTaskGetCodeSignStatus
+Return Value: 0x22014221
+Leaving SecTaskCopySigningIdentifier
+Return Value: 0x600002df4060
+Leaving SecTaskCopySigningIdentifier
+Return Value: 0x600002df4060
+Leaving SecCodeCopySelf
+Return Value: 0x0
+Leaving SecCodeCopySelf
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecCodeCheckValidity
+Return Value: 0x0
+Leaving SecCodeCopyPath
+Return Value: 0x0
+Leaving SecCodeCopyPath
+Return Value: 0x0
+Leaving SecStaticCodeCreateWithPath
+Return Value: 0x0
+Leaving SecStaticCodeCheckValidity
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecStaticCodeCreateWithPath
+Return Value: 0x0
+Leaving SecStaticCodeCheckValidity
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecStaticCodeCreateWithPath
+Return Value: 0x0
+Leaving SecStaticCodeCheckValidity
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecCodeCopySigningInformation
+Return Value: 0x0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x600000144280
+Leaving SecTaskCreateFromSelf
+Return Value: 0x600000144280
+Leaving SecStaticCodeCreateWithPath
+Return Value: 0x0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x6000001638e0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x6000001638e0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x600000163bb0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x600000163bb0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x60000011dcc0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x60000011dcc0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x60000011dcc0
+Leaving SecTaskCreateFromSelf
+Return Value: 0x60000011dcc0
+
+
+Value In: RzIUdisBdpZv3m9xujbFpg==
+Key: 0Fenvp6WaFVO4y133m/PEngmJwUN9m02LLuK/4hUf8A=
+IV: eCYnBQ32bTYsu4r/iFR/wA==
+Key (hex): d057a7be9e9668554ee32d77de6fcf12782627050df66d362cbb8aff88547fc0
+IV (hex): 782627050df66d362cbb8aff88547fc0
+Data Out (hex): 0304024e53457874656e73696f6e00000000000000000000000000000000000000000000000000000000000000000000
+Value Out: 030402NSExtension
+6000034d0ed0  03 04 02 4e 53 45 78 74 65 6e 73 69 6f 6e 00     ...NSExtension.
+
