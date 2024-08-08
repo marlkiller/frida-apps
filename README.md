@@ -7,6 +7,10 @@
 doc : https://frida.re/docs/examples/macos/
 pip3 install frida-tools
 pip3 install thop
+
+pip3 install --upgrade frida
+pip3 install --upgrade frida-tools
+
 ```
 
 ### 0x0: 准备

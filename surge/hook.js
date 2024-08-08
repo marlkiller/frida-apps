@@ -384,67 +384,82 @@ function get_func_addr(module, offset) {
 //         // 可以在这里处理返回值，如果需要的话
 //     }
 // });
+//
+//
+// Interceptor.attach(Module.getExportByName(null, 'sendto'), {
+//     onEnter: function (args) {
+//         var sockfd = args[0].toInt32();
+//         var buf = args[1];
+//         var len = args[2].toInt32();
+//         var dest_addr = args[4];
+//         if (dest_addr.equals(0)) {
+//             dest_addr = Memory.alloc(16);
+//             var addr_len = Memory.alloc(4);
+//             Memory.writeU32(addr_len, 16);
+//             var getpeername = new NativeFunction(Module.findExportByName(null, "getpeername"), "int", ["int", "pointer", "pointer"]);
+//             getpeername(sockfd, dest_addr, addr_len);
+//         }
+//         var sin_family = Memory.readU8(dest_addr.add(1));
+//         if (sin_family != 2) return;
+//         var sin_port = Memory.readU16(dest_addr.add(2));
+//         sin_port = ((sin_port & 0xff) << 8) | ((sin_port >> 8) & 0xff);
+//         var sin_addr = Memory.readU32(dest_addr.add(4));
+//         var sin_ip = (sin_addr & 0xff).toString() + '.' + ((sin_addr >> 8) & 0xff).toString() +
+//             '.' + ((sin_addr >> 16) & 0xff).toString() + '.' + ((sin_addr >> 24) & 0xff).toString();
+//         console.log("sendto(sockfd=" + args[0] + ",buflen=" + len + ",family=" + sin_family +
+//             ",ip=" + sin_ip + ",port=" + sin_port + ")");
+//         console.log(hexdump(buf, {length: len, header: false}));
+//     },
+//     onLeave: function (retval) {
+//         console.log('sendto return value: ' + retval.toInt32());
+//     }
+// });
+//
+// // Hook recvfrom function
+// Interceptor.attach(Module.getExportByName(null, 'recvfrom'), {
+//     onEnter: function (args) {
+//         this.gargs = new Array(6);
+//         for (var i = 0; i < 6; i++) {
+//             this.gargs[i] = args[i];
+//         }
+//     },
+//     onLeave: function (retval) {
+//         var args = this.gargs;
+//         var sockfd = args[0].toInt32();
+//         var buf = args[1];
+//         var len = retval.toInt32();
+//         var dest_addr = args[4];
+//         if (dest_addr.equals(0)) {
+//             dest_addr = Memory.alloc(16);
+//             var addr_len = Memory.alloc(4);
+//             Memory.writeU32(addr_len, 16);
+//             var getpeername = new NativeFunction(Module.findExportByName(null, "getpeername"), "int", ["int", "pointer", "pointer"]);
+//             getpeername(sockfd, dest_addr, addr_len);
+//         }
+//         var sin_family = Memory.readU8(dest_addr.add(1));
+//         if (sin_family !== 2) return;
+//         var sin_port = Memory.readU16(dest_addr.add(2));
+//         sin_port = ((sin_port & 0xff) << 8) | ((sin_port >> 8) & 0xff);
+//         var sin_addr = Memory.readU32(dest_addr.add(4));
+//         var sin_ip = (sin_addr & 0xff).toString() + '.' + ((sin_addr >> 8) & 0xff).toString() +
+//             '.' + ((sin_addr >> 16) & 0xff).toString() + '.' + ((sin_addr >> 24) & 0xff).toString();
+//         console.log("recvfrom(sockfd=" + args[0] + ",buflen=" + len + ",family=" + sin_family +
+//             ",ip=" + sin_ip + ",port=" + sin_port + ")");
+//         console.log(hexdump(buf, {length: len, header: false}));
+//     }
+// });
 
 
-Interceptor.attach(Module.getExportByName(null, 'sendto'), {
-    onEnter: function (args) {
-        var sockfd = args[0].toInt32();
-        var buf = args[1];
-        var len = args[2].toInt32();
-        var dest_addr = args[4];
-        if (dest_addr.equals(0)) {
-            dest_addr = Memory.alloc(16);
-            var addr_len = Memory.alloc(4);
-            Memory.writeU32(addr_len, 16);
-            var getpeername = new NativeFunction(Module.findExportByName(null, "getpeername"), "int", ["int", "pointer", "pointer"]);
-            getpeername(sockfd, dest_addr, addr_len);
-        }
-        var sin_family = Memory.readU8(dest_addr.add(1));
-        if (sin_family != 2) return;
-        var sin_port = Memory.readU16(dest_addr.add(2));
-        sin_port = ((sin_port & 0xff) << 8) | ((sin_port >> 8) & 0xff);
-        var sin_addr = Memory.readU32(dest_addr.add(4));
-        var sin_ip = (sin_addr & 0xff).toString() + '.' + ((sin_addr >> 8) & 0xff).toString() +
-            '.' + ((sin_addr >> 16) & 0xff).toString() + '.' + ((sin_addr >> 24) & 0xff).toString();
-        console.log("sendto(sockfd=" + args[0] + ",buflen=" + len + ",family=" + sin_family +
-            ",ip=" + sin_ip + ",port=" + sin_port + ")");
-        console.log(hexdump(buf, {length: len, header: false}));
-    },
-    onLeave: function (retval) {
-        console.log('sendto return value: ' + retval.toInt32());
-    }
-});
 
-// Hook recvfrom function
-Interceptor.attach(Module.getExportByName(null, 'recvfrom'), {
-    onEnter: function (args) {
-        this.gargs = new Array(6);
-        for (var i = 0; i < 6; i++) {
-            this.gargs[i] = args[i];
-        }
-    },
-    onLeave: function (retval) {
-        var args = this.gargs;
-        var sockfd = args[0].toInt32();
-        var buf = args[1];
-        var len = retval.toInt32();
-        var dest_addr = args[4];
-        if (dest_addr.equals(0)) {
-            dest_addr = Memory.alloc(16);
-            var addr_len = Memory.alloc(4);
-            Memory.writeU32(addr_len, 16);
-            var getpeername = new NativeFunction(Module.findExportByName(null, "getpeername"), "int", ["int", "pointer", "pointer"]);
-            getpeername(sockfd, dest_addr, addr_len);
-        }
-        var sin_family = Memory.readU8(dest_addr.add(1));
-        if (sin_family !== 2) return;
-        var sin_port = Memory.readU16(dest_addr.add(2));
-        sin_port = ((sin_port & 0xff) << 8) | ((sin_port >> 8) & 0xff);
-        var sin_addr = Memory.readU32(dest_addr.add(4));
-        var sin_ip = (sin_addr & 0xff).toString() + '.' + ((sin_addr >> 8) & 0xff).toString() +
-            '.' + ((sin_addr >> 16) & 0xff).toString() + '.' + ((sin_addr >> 24) & 0xff).toString();
-        console.log("recvfrom(sockfd=" + args[0] + ",buflen=" + len + ",family=" + sin_family +
-            ",ip=" + sin_ip + ",port=" + sin_port + ")");
-        console.log(hexdump(buf, {length: len, header: false}));
-    }
-});
+// call subxxx
+var funcAddress = get_func_addr('Surge', 0xf478);
+var fun = new NativeFunction(funcAddress, 'void', []);
+// var fun = new NativeFunction(funcAddress, 'void', ['int', 'float']);
+fun();
+
+// 循环执行函数
+// var interval = 1000; // 设定循环间隔（毫秒）
+// setInterval(function() {
+//     var result = fun();
+//     console.log("Function returned: " + result);
+// }, interval);
