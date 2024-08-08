@@ -352,28 +352,99 @@ function get_func_addr(module, offset) {
 // });
 
 
-
 // 目标地址
-Interceptor.attach(ptr(get_func_addr('Surge', 0xf714)), {
+//
+// // 000000010000e8cc         cmp        r14d, r13d
+// // 000000010000e8cf         jne        loc_10000e900
+// Interceptor.attach(ptr(get_func_addr('Surge', 0xe8cc)), {
+//     onEnter: function (args) {
+//         // 打印寄存器 w25 和 w20 的值
+//         // 0x1cf3fd11
+//         // 0x1cf3fd11
+//         // 0xa0f3fd11
+//         // 0xa0f3fd11
+//         console.log(this.context.r13);
+//         console.log(this.context.r14);
+//     },
+//     onLeave: function (retval) {
+//         // 可以在这里处理返回值，如果需要的话
+//     }
+// });
+//
+//
+// // 00000001000145a5         cmp        r14d, r13d
+// // 00000001000145a8         jne        loc_100014616
+// Interceptor.attach(ptr(get_func_addr('Surge', 0x145a5)), {
+//     onEnter: function (args) {
+//         // 打印寄存器 w25 和 w20 的值
+//         console.log(this.context.r13);
+//         console.log(this.context.r14);
+//     },
+//     onLeave: function (retval) {
+//         // 可以在这里处理返回值，如果需要的话
+//     }
+// });
+
+
+Interceptor.attach(Module.getExportByName(null, 'sendto'), {
     onEnter: function (args) {
-        // 打印寄存器 w25 和 w20 的值
-        console.log('1 w25:', this.context.regs.w25.toString());
-        console.log('1 w20:', this.context.regs.w20.toString());
+        var sockfd = args[0].toInt32();
+        var buf = args[1];
+        var len = args[2].toInt32();
+        var dest_addr = args[4];
+        if (dest_addr.equals(0)) {
+            dest_addr = Memory.alloc(16);
+            var addr_len = Memory.alloc(4);
+            Memory.writeU32(addr_len, 16);
+            var getpeername = new NativeFunction(Module.findExportByName(null, "getpeername"), "int", ["int", "pointer", "pointer"]);
+            getpeername(sockfd, dest_addr, addr_len);
+        }
+        var sin_family = Memory.readU8(dest_addr.add(1));
+        if (sin_family != 2) return;
+        var sin_port = Memory.readU16(dest_addr.add(2));
+        sin_port = ((sin_port & 0xff) << 8) | ((sin_port >> 8) & 0xff);
+        var sin_addr = Memory.readU32(dest_addr.add(4));
+        var sin_ip = (sin_addr & 0xff).toString() + '.' + ((sin_addr >> 8) & 0xff).toString() +
+            '.' + ((sin_addr >> 16) & 0xff).toString() + '.' + ((sin_addr >> 24) & 0xff).toString();
+        console.log("sendto(sockfd=" + args[0] + ",buflen=" + len + ",family=" + sin_family +
+            ",ip=" + sin_ip + ",port=" + sin_port + ")");
+        console.log(hexdump(buf, {length: len, header: false}));
     },
     onLeave: function (retval) {
-        // 可以在这里处理返回值，如果需要的话
+        console.log('sendto return value: ' + retval.toInt32());
     }
 });
 
-// 0000000100014584         cmp        w25, w20
-// 0000000100014588         b.ne       loc_100014604
-Interceptor.attach(ptr(get_func_addr('Surge', 0x14584)), {
+// Hook recvfrom function
+Interceptor.attach(Module.getExportByName(null, 'recvfrom'), {
     onEnter: function (args) {
-        // 打印寄存器 w25 和 w20 的值
-        console.log('2 w25:', this.context.regs.w25.toString());
-        console.log('2 w20:', this.context.regs.w20.toString());
+        this.gargs = new Array(6);
+        for (var i = 0; i < 6; i++) {
+            this.gargs[i] = args[i];
+        }
     },
     onLeave: function (retval) {
-        // 可以在这里处理返回值，如果需要的话
+        var args = this.gargs;
+        var sockfd = args[0].toInt32();
+        var buf = args[1];
+        var len = retval.toInt32();
+        var dest_addr = args[4];
+        if (dest_addr.equals(0)) {
+            dest_addr = Memory.alloc(16);
+            var addr_len = Memory.alloc(4);
+            Memory.writeU32(addr_len, 16);
+            var getpeername = new NativeFunction(Module.findExportByName(null, "getpeername"), "int", ["int", "pointer", "pointer"]);
+            getpeername(sockfd, dest_addr, addr_len);
+        }
+        var sin_family = Memory.readU8(dest_addr.add(1));
+        if (sin_family !== 2) return;
+        var sin_port = Memory.readU16(dest_addr.add(2));
+        sin_port = ((sin_port & 0xff) << 8) | ((sin_port >> 8) & 0xff);
+        var sin_addr = Memory.readU32(dest_addr.add(4));
+        var sin_ip = (sin_addr & 0xff).toString() + '.' + ((sin_addr >> 8) & 0xff).toString() +
+            '.' + ((sin_addr >> 16) & 0xff).toString() + '.' + ((sin_addr >> 24) & 0xff).toString();
+        console.log("recvfrom(sockfd=" + args[0] + ",buflen=" + len + ",family=" + sin_family +
+            ",ip=" + sin_ip + ",port=" + sin_port + ")");
+        console.log(hexdump(buf, {length: len, header: false}));
     }
 });

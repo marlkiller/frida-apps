@@ -1,6 +1,7 @@
 ## frida + python3 hook demo
 
 > https://codeshare.frida.re/browse
+> https://crifan.github.io/reverse_debug_frida/website/frida_example/online_other_case/
 
 ```shell
 doc : https://frida.re/docs/examples/macos/
