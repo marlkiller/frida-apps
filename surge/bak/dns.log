@@ -1,0 +1,62 @@
+ 'SGSocket-346', stop reason = EXC_BAD_INSTRUCTION (code=EXC_I386_INVOP, subcode=0x0)
+ p 参数第一位如果是 3, 会走这个地方
+ 会发起一个 DNS 查询 sendto(sockfd=0x1b,buflen=70,family=2,ip=13.248.139.174,port=53), Extraneous Data 0d0a02{device_id}:
+ 正版的情况下, 在执行 recvfrom 时会直接返回 -1
+ 而盗版的会返回一段 A 记录的值 (17.253.243.231),与 0xf3fd11 做比较 ,相等 则会导致程序奔溃
+
+
+DNS TO: 13.248.139.174 53
+
+sendto(sockfd=0x1b,buflen=70,family=2,ip=13.248.139.174,port=53)
+6000035061b0  e2 05 01 00 00 01 00 00 00 00 00 00 07 63 61 70  .............cap
+6000035061c0  74 69 76 65 05 61 70 70 6c 65 03 63 6f 6d 00 00  tive.apple.com..
+6000035061d0  01 00 01 0d 0a 02 31 36 62 38 66 34 62 64 66 64  ......16b8f4bdfd
+6000035061e0  35 35 64 32 39 66 37 33 37 34 32 37 62 34 65 63  55d29f737427b4ec
+6000035061f0  30 63 31 34 64 37                                0c14d7
+sendto return value: 70
+
+Domain Name System (query)
+    Transaction ID: 0xe205
+    Flags: 0x0100 Standard query
+    Questions: 1
+    Answer RRs: 0
+    Authority RRs: 0
+    Additional RRs: 0
+    Queries
+        captive.apple.com: type A, class IN
+            Name: captive.apple.com
+            [Name Length: 17]
+            [Label Count: 3]
+            Type: A (1) (Host Address)
+            Class: IN (0x0001)
+    [Response In: 2]
+    Extraneous Data (35 bytes)
+        Extraneous Data Bytes: 0d0a023136623866346264666435356432396637333734323762346563306331346437
+        [Extraneous Data Length: 35]
+
+
+recvfrom(sockfd=0x1b,buflen=54,family=2,ip=13.248.139.174,port=53)
+70000f57d6e0  e2 05 81 80 00 01 00 01 00 00 00 01 05 61 70 70  .............app
+70000f57d6f0  6c 65 03 63 6f 6d 00 00 01 00 01 c0 0c 00 01 00  le.com..........
+70000f57d700  01 00 00 03 4f 00 04 11 fd f3 e7 00 00 29 02 00  ....O........)..
+70000f57d710  00 00 00 00 00 00                                ......
+
+Domain Name System (response)
+    Transaction ID: 0xe205
+    Flags: 0x8180 Standard query response, No error
+    Questions: 1
+    Answer RRs: 1
+    Authority RRs: 0
+    Additional RRs: 1
+    Queries
+    Answers
+        apple.com: type A, class IN, addr 17.253.243.231
+            Name: apple.com
+            Type: A (1) (Host Address)
+            Class: IN (0x0001)
+            Time to live: 847 (14 minutes, 7 seconds)
+            Data length: 4
+            Address: 17.253.243.231
+    Additional records
+    [Request In: 1]
+    [Time: 0.156612000 seconds]
