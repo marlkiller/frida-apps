@@ -32,6 +32,7 @@ frida-trace -m "-[NSView drawRect:]" Safari
 frida-trace -i printOneOneZero -p 11986
 # -f 表示启动某个进程（后面跟着应用的 bundleId）
 frida-trace -f "/Applications/DevUtils.app/Contents/MacOS/DevUtils" -m "+[NSURL URLWithString:]"    
+frida-trace -f "C:\workspace\c\oracle_oci_demo\ocis\instantclient_10_2\sqlplus.exe" -i 'LoadLibraryA'
 
 # -d, --decorate       将模块名称添加到生成的 onEnter
 
