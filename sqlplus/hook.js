@@ -1,23 +1,46 @@
+function logMessage(message) {
+//    console.log(message);
+     var file = new File("frida_out.log","a+");//a+表示追加内容，此处的模式和c语言的fopen函数模式相同
+     file.write(message + "\n");
+     file.flush()
+     file.close();
+}
+
+// 用于存储库句柄和库名的映射
+var libraryMap = {};
+
+// 拦截 LoadLibraryA 函数
 Interceptor.attach(Module.findExportByName(null, 'LoadLibraryA'), {
     onEnter: function (args) {
-        // args[0] is the first argument to LoadLibraryA, which is the library name
         this.libName = Memory.readUtf8String(args[0]);
-        console.log('LoadLibraryA called with:', this.libName);
     },
     onLeave: function (retval) {
-        // Optionally modify the return value if needed
+        // 将加载的库名与库句柄关联
+        if (retval.toInt32() !== 0) {
+            libraryMap[retval.toString()] = this.libName;
+//            logMessage('LoadLibraryA called with:' + this.libName);
+            logMessage('LoadLibraryA called with:' + this.libName);
+        }
     }
 });
 
+// 拦截 GetProcAddress 函数
 Interceptor.attach(Module.findExportByName(null, 'GetProcAddress'), {
     onEnter: function (args) {
-        // args[0] is the handle to the library obtained from LoadLibraryA
-        // args[1] is the name of the function to get the address of
-        var libHandle = args[0];
+        var libHandle = args[0].toString();
         var funcName = Memory.readUtf8String(args[1]);
-        console.log('GetProcAddress called with handle:', libHandle, 'and function name:', funcName);
+
+        // 从库句柄获取库名
+        var libName = libraryMap[libHandle];
+
+        if (funcName.startsWith("OCI")) {
+            logMessage('Filtered GetProcAddress call: libName:'+ libName +  ', function name:' + funcName);
+            this.filtered = true;
+        } else {
+//            logMessage('GetProcAddress called with libName:', libName, 'function name:', funcName);
+        }
     },
     onLeave: function (retval) {
-        // Optionally modify the return value if needed
+
     }
 });
