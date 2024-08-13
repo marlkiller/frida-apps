@@ -16,7 +16,7 @@ with open('hook.js', 'r', encoding="utf-8") as f:
 
 
 # sqlplus 127.0.0.1:1521/xe
-# sqlplus user_dev/123456@127.0.0.1:1521/xe
+# sqlplus user_dev/123456@127.0.0.1:1521/xe1
 # select * from all_users;
 # pid = frida.spawn([r"C:\workspace\c\oracle_oci_demo\ocis\instantclient_10_2\sqlplus.exe","user_dev/123456@127.0.0.1:1521/xe"], enable_debugger=True)
 pid = frida.spawn([r"C:\workspace\c\oracle_oci_demo\ocis\instantclient_10_2\sqlplus.exe"])
