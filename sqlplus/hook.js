@@ -108,23 +108,22 @@ function logMessage(message) {
 
 Interceptor.attach(Module.getExportByName(null, 'WSASend'), {
     onEnter: function (args) {
-       console.log("WSASend")
+//       console.log("WSASend")
        try{
+//            console.log('s: ', args[0]);
+//            console.log('lpBuffers: ', args[1]);
+//            console.log('dwBufferCount: ', args[2]);
+//            console.log('lpNumberOfBytesSent: ', args[3]);
+//            console.log('dwFlags: ', args[4]);
+//            console.log('lpOverlapped: ', args[5]);
+//            console.log('lpCompletionRoutine: ', args[6]);
 
-            console.log('s: ', args[0]);
-            console.log('lpBuffers: ', args[1]);
-            console.log('dwBufferCount: ', args[2]);
-            console.log('lpNumberOfBytesSent: ', args[3]);
-            console.log('dwFlags: ', args[4]);
-            console.log('lpOverlapped: ', args[5]);
-            console.log('lpCompletionRoutine: ', args[6]);
 
-
-            console.log(hexdump(ptr(args[1]), {
-                    length: 16,
-                    header: true,
-                    ansi: true
-                }))
+//            console.log(hexdump(ptr(args[1]), {
+//                    length: 16,
+//                    header: true,
+//                    ansi: true
+//                }))
             var lpBuffers = args[1];
             var buff_len = lpBuffers.readULong();
             var buff_data = lpBuffers.add(Process.pointerSize).readPointer();
@@ -132,13 +131,31 @@ Interceptor.attach(Module.getExportByName(null, 'WSASend'), {
             // 0000000000145960  0E 01 00 00 00 00 00 00  26 C8 AC 00 00 00 00 00
             // buff.len = 270
             // buff.data = 0xACC826
+            // 检查第六个字节是否为 06
+            if (
+            Memory.readU8(ptr(buff_data).add(4)) === 0x06
+              && Memory.readU8(ptr(buff_data).add(0xa)) === 3
+              && Memory.readU8(ptr(buff_data).add(0xB)) === 0x76
+            ){
 
-            console.log('buff_len:', buff_len);
-            console.log(hexdump(ptr(buff_data), {
+               var oraociei10Base = Module.findBaseAddress("oraociei10.dll");
+               console.log('oraociei10Base:', oraociei10Base);
+//             && Memory.readByte(ptr(buff_data).add(0xa)) === 3
+//             && Memory.readByte(ptr(buff_data).add(0xB)) === 76
+                // 如果第六个字节是 06，则输出堆栈
+                console.log('buff_len:', buff_len);
+                console.log(hexdump(ptr(buff_data), {
                     length: buff_len,
                     header: true,
                     ansi: true
                 }))
+
+                console.log(' called from:\n' +Thread.backtrace(this.context, Backtracer.ACCURATE).map(DebugSymbol.fromAddress).join('\n') + '\n');
+//                console.trace();
+            } else {
+//                console.log("第六个字节不是 06。");
+            }
+
        }catch(e){
             console.error('Error in onEnter:', e);
        }
@@ -155,26 +172,27 @@ Interceptor.attach(Module.getExportByName(null, 'WSASend'), {
 //  [in]      LPWSAOVERLAPPED                    lpOverlapped,
 //  [in]      LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
 //);
+// C:\Windows\System32\WS2_32.dll	00007FFEBE6E0000	000000000006B000
 Interceptor.attach(Module.getExportByName(null, 'WSARecv'), {
     onEnter: function (args) {
-        console.log("WSARecv");
+//        console.log("WSARecv");
         try {
-            console.log('s: ', args[0]);
-            console.log('lpBuffers: ', args[1]);
-            console.log('dwBufferCount: ', args[2]);
-            console.log('lpNumberOfBytesRecvd: ', args[3]);
-            console.log('dwFlags: ', args[4]);
-            console.log('lpOverlapped: ', args[5]);
-            console.log('lpCompletionRoutine: ', args[6]);
+//            console.log('s: ', args[0]);
+//            console.log('lpBuffers: ', args[1]);
+//            console.log('dwBufferCount: ', args[2]);
+//            console.log('lpNumberOfBytesRecvd: ', args[3]);
+//            console.log('dwFlags: ', args[4]);
+//            console.log('lpOverlapped: ', args[5]);
+//            console.log('lpCompletionRoutine: ', args[6]);
 
             this.lpNumberOfBytesRecvd = args[3]
             // ptr(args[1]
             this.lpBuffers = args[1];
-            console.log(hexdump(ptr(args[1]), {
-                    length: 16,
-                    header: true,
-                    ansi: true
-                }))
+//            console.log(hexdump(ptr(args[1]), {
+//                    length: 16,
+//                    header: true,
+//                    ansi: true
+//                }))
 
 
         } catch (e) {
@@ -182,17 +200,17 @@ Interceptor.attach(Module.getExportByName(null, 'WSARecv'), {
         }
     },
     onLeave: function (retval) {
-        console.log("WSARecv - onLeave");
+//        console.log("WSARecv - onLeave");
         try {
-           console.log('retval:', retval);
+//           console.log('retval:', retval);
            var buff_len = ptr(this.lpNumberOfBytesRecvd).readInt()
            var buff_data = this.lpBuffers.add(Process.pointerSize).readPointer();
-           console.log('buff_len:', buff_len);
-           console.log(hexdump(ptr(buff_data), {
-                    length: buff_len,
-                    header: true,
-                    ansi: true
-               }))
+//           console.log('buff_len:', buff_len);
+//           console.log(hexdump(ptr(buff_data), {
+//                    length: buff_len,
+//                    header: true,
+//                    ansi: true
+//               }))
 
         } catch (e) {
             console.error('Error in onLeave:', e);
