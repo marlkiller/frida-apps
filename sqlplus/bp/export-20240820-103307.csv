@@ -1,0 +1,11 @@
+类型,地址,模块/标签/异常,状态,反汇编,命中,摘要
+软件断点,,,,,,
+,000000000266C552,oraociei10.dll,已启用,"mov word ptr ds:[r10],r9w",0,"写入 Byte Call ID:  r9w 写入内容, r10 写入位置 ->>> Call ID: Generic authentication call (0x76)  02  , 暂停条件((r9&FF)==0x73)"
+,000000000266C5AA,oraociei10.dll,已启用,call oraociei10.2673704,0,封装参数 rdx = Call id
+,0000000002682591,oraociei10.dll,已启用,"mov byte ptr ds:[rdx],r9b",0,"写入字符串长度(0F)r9 : rdx 写入位置,r9 写入长度 ,rcx 字符串截至位置"
+,00000000026825B1,oraociei10.dll,已启用,call oraociei10.3164658,0,"写入字符串: rcx 写入位置, [rdx] 写入字符串, r8r9 写入长度"
+,000000000269BA46,oraociei10.dll,已启用,"mov dword ptr ds:[r9],r8d",0,"写入 Int(27 00 00 00): r8 写入值, r9 写入位置 "
+,000000000269BE98,oraociei10.dll,已启用,call oraociei10.3164658,0,"写入 Int(18 00 00 00): rcx 写入位置, [cdx] 写入的值, r8r9 写入长度"
+,000000000269CA9E,oraociei10.dll,已启用,call r11,0,写入 Byte : ????写入一个 01?
+,00000000030B5C4C,oraociei10.dll,已启用,call oraociei10.3164658,0,"写入 Byte DataID: 写入位置 rcx, 写入值 [rdx], 写入长度 r8 ->>> Data ID: User OCI Functions (0x00000003)"
+,00007FFF18C91F60,<ws2_32.dll.WSASend>,已禁用,"mov qword ptr ss:[rsp+8],rbx",0,
