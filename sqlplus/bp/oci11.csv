@@ -1,0 +1,25 @@
+类型,地址,模块/标签/异常,状态,反汇编,命中,摘要
+软件断点,,,,,,
+,00007FFF18C91F60,<ws2_32.dll.WSASend>,已禁用,"mov qword ptr ss:[rsp+8],rbx",0,dump [rdx+8]
+,00000000035CFEF8,oraociei11.dll,已禁用,"mov ecx,dword ptr ss:[rsp+54]",0,call WSARecv dump [rsp+40+8]
+,00007FFF18CA0500,<ws2_32.dll.WSARecv>,已禁用,"mov qword ptr ss:[rsp+8],rbx",0,call WSARecv dump [rsp+40+8]
+,00000000026B3201,oraociei11.dll,已禁用,"mov byte ptr ds:[r8],r9b",0,>>> 写入字符串长度: 位置 r8 内容 r9
+,00000000026B3222,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,>>> 写入 r8 长度字符串: 位置 rcx 内容 rdx 
+,00000000026A419E,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,>>> 写入 r8 长度: 位置 rdx 内容rcx 
+,00000000026CAF8C,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,>>> 写入 r8 长度: 位置 rcx 内容 rdx 
+,00000000037AE914,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,>>> 写入 data id: 位置 rcx 内容rdx
+,00000000026CAB13,oraociei11.dll,已禁用,"mov dword ptr ds:[r9],r8d",0,>>> 写入 4 字节 dword: 位置 r9 内容 r8
+,00000000026965F2,oraociei11.dll,已禁用,"mov word ptr ds:[r10],r9w",0,>>> 写入 2 字节: 位置 r10 内容 r9
+,00000000026B2958,oraociei11.dll,已禁用,"mov byte ptr ds:[r8],bl",0,>>> 写入 1 字节: 位置 r8 内容rbx
+,000000000269F510,oraociei11.dll,已禁用,"mov byte ptr ds:[r11],r10b",0,>>> 写入 1 字节: 位置 r11 内容 r10
+,00000000026971EE,oraociei11.dll,已禁用,"mov byte ptr ds:[r9],3",0,>>> 写入 03: 位置 r9
+,00000000026B3BC2,oraociei11.dll,已禁用,"movzx ecx,byte ptr ds:[r10]",0,<<<< 读取字符串长度 : 位置 r10 重复??
+,00000000026B410C,oraociei11.dll,已禁用,"movzx r8d,byte ptr ds:[r10]",0,<<< 读取字符串长度 : 位置 r10
+,00000000026CAC5D,oraociei11.dll,已禁用,"mov r8d,dword ptr ds:[r8]",0,<<< 读取 一个字节: 位置 r8 这里可能是 rsi 4个字节?
+,00000000026B412B,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,<<< 读取 r8 长度字符串: 位置 rdx
+,00000000026CAF03,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,<<< 读取 r8 长度: 位置 rdx
+,00000000032336C9,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,<<< 读取 r8 长度: 位置 rdx
+,00000000037B22BE,oraociei11.dll,已禁用,call oraociei11.3AE325C,0,<<< 读取 data id: 位置 rdx 长度 r8
+,00000000026CB443,oraociei11.dll,已禁用,"movzx edx,byte ptr ds:[r8]",0,<<< 读取 1 字节标志位: 位置 r8
+,0000000003233687,oraociei11.dll,已禁用,"movzx r11d,byte ptr ds:[r9]",0,<<< 读取 1 字节: 位置 r9
+,00000000026CBC34,oraociei11.dll,已禁用,"movzx r11d,byte ptr ds:[r11]",0,<<< 读取 1 字节: 位置 r11
