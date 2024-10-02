@@ -20,7 +20,7 @@ with open('hook.js', 'r', encoding="utf-8") as f:
 
 # 在 Spawn模式下，Frida 直接启动目标进程，然后在该进程中注入 Frida 的 Agent，也就是说，启动既注入；
 # 在 Attach 模式下，Frida 会依附到已经运行的目标进程上，并在该进程中注入 Agent；
-pid = frida.spawn(["/Applications/Surge.app/Contents/MacOS/Surge"])
+pid = frida.spawn(["/Applications/MindMac.app/Contents/MacOS/MindMac"])
 frida.resume(pid)
 session = frida.attach(pid)
 

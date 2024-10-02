@@ -38,52 +38,6 @@ if (ObjC.available) {
     // });
 
 
-    // Interceptor.attach(ObjC.classes.SGDNSPacket['+ queryPacketWithDomain:identifier:queryType:'].implementation, {
-    //     onEnter: function (args) {
-    //         // args[0] 是 self（SGDNSPacket 对象）
-    //         // args[1] 是 _cmd（选择子）
-    //         // args[2] 是 domain 参数
-    //         // args[3] 是 identifier 参数
-    //         // args[4] 是 queryType 参数
-    //
-    //         var domain = ObjC.Object(args[2]).toString();
-    //         // 检查 domain 是否匹配
-    //         if (domain === 'captive.apple.com') {
-    //             console.log('queryPacketWithDomain:identifier:queryType: called');
-    //             console.log('Domain: ' + domain);
-    //             console.log('Identifier: ' + args[3].toInt32());
-    //             console.log('Query Type: ' + args[4].toInt32());
-    //             // 打印调用堆栈
-    //             var backtrace = Thread.backtrace(this.context, Backtracer.ACCURATE)
-    //                 .map(DebugSymbol.fromAddress)
-    //                 .join('\n');
-    //             console.log('Call Stack:\n' + backtrace);
-    //         }
-    //     },
-    //     onLeave: function (retval) {
-    //         // 输出 retval 的内容
-    //         var retvalType = typeof retval;
-    //         // 打印 retval 的值，根据其类型进行适当的转换
-    //         if (retvalType === 'object') {
-    //             // 如果 retval 是对象（例如指针），可以进一步检查
-    //             if (retval.isNull()) {
-    //                 console.log('Return Value is null');
-    //             } else {
-    //                 var obj = ObjC.Object(retval);
-    //                 // 获取对象的类信息
-    //                 // var cls = obj.$class;
-    //                 // var className = cls.$className;
-    //                 console.log('Return Value (Object): ' + obj.toString());
-    //             }
-    //         } else if (retvalType === 'number') {
-    //             console.log('Return Value (Number): ' + retval.toInt32());
-    //         } else {
-    //             console.log('Return Value: ' + retval.toString());
-    //         }
-    //     }
-    // });
-
-
     // 判断替换方法
     // var method = ObjC.classes.SGDNSPacket['+ queryPacketWithDomain:identifier:queryType:'];
     // var origImp = method.implementation;
@@ -112,35 +66,6 @@ if (ObjC.available) {
     //     return origImp(self, sel, domain, identifier, queryType);
     // });
 
-
-    // 挂钩 SGDNSPacket 类的 -answer 方法
-    // var SGDNSPacket = ObjC.classes.SGDNSPacket;
-    // var method = SGDNSPacket['- answer'];
-    //
-    // Interceptor.attach(method.implementation, {
-    //     onEnter: function (args) {
-    //         // 输出 self 的信息
-    //         var self = new ObjC.Object(args[0]);
-    //         console.log('self: ' + self);
-    //
-    //         // 遍历 self 的属性
-    //         var props = self.$ownMethods;
-    //         console.log('self properties: ' + props.join(', '));
-    //     },
-    //     onLeave: function (retval) {
-    //         if (retval.isNull()) {
-    //             console.log("answer returned null");
-    //             return;
-    //         }
-    //         // 遍历 NSArray 的代码如下：
-    //         var array = new ObjC.Object(retval);
-    //         var count = array.count().valueOf();
-    //         for (var i = 0; i !== count; i++) {
-    //           var element = array.objectAtIndex_(i);
-    //           console.log(element);
-    //         }
-    //     }
-    // });
 
 } else {
     console.log('Objective-C Runtime is not available!');
@@ -327,17 +252,18 @@ function get_func_addr(module, offset) {
 }
 
 // hook subxx 方法
-// var cap1 = get_func_addr('Surge', 0xf478);
-// Interceptor.attach(ptr(cap1), {
-//    onEnter: function(args) {
-//       console.log("cap1 onEnter");
-//       readMemory();
-//    },
-//    onLeave: function(retval) {
-//       console.log("cap1 onLeave");
-//       readMemory();
-//    }
-// });
+var cap1 = get_func_addr('Surge', 0x1ce6b0);
+Interceptor.attach(ptr(cap1), {
+   onEnter: function(args) {
+      console.log("cap1 onEnter");
+      // readMemory();
+   },
+   onLeave: function(retval) {
+      console.log("cap1 onLeave");
+      // readMemory();
+       retval.replace(1);  //将返回值替换成0
+   }
+});
 //
 // var cap2 = get_func_addr('Surge', 0x142e8);
 // Interceptor.attach(ptr(cap2), {
@@ -452,10 +378,10 @@ function get_func_addr(module, offset) {
 
 
 // call subxxx
-var funcAddress = get_func_addr('Surge', 0xf478);
-var fun = new NativeFunction(funcAddress, 'void', []);
+// var funcAddress = get_func_addr('Surge', 0xf478);
+// var fun = new NativeFunction(funcAddress, 'void', []);
 // var fun = new NativeFunction(funcAddress, 'void', ['int', 'float']);
-fun();
+// fun();
 
 // 循环执行函数
 // var interval = 1000; // 设定循环间隔（毫秒）

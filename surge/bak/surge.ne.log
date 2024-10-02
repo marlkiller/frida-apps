@@ -1,0 +1,57 @@
+objectForKeyedSubscript: called with key:  __NSDictionaryM {
+    AuthMethod = Password;
+    ServerAddress = Surge;
+    deviceID = 16b8f4bdfd55d29f737427b4ec0c14d7;
+    pid = 66385;
+    tunnel = {length = 2320, bytes = 0x62706c69 73743030 d4010203 04050607 ... 00000000 00000738 };
+    userRoot = "/Users/voidm";
+} userRoot
+
+objectForKeyedSubscript: called with key:  __NSDictionaryI {
+    enterprise = 0;
+    policy = ewogICJwIiA6ICJRVTFvSHg4SWJ4VTFQdlFRMzM0MEpBPT0iLAogICJkZXZpY2VJRCIgOiAiMTZiOGY0YmRmZDU1ZDI5ZjczNzQyN2I0ZWMwYzE0ZDciLAogICJwcm9kdWN0IiA6ICJTVVJHRU1BQzUiLAogICJ0eXBlIiA6ICJsaWNlbnNlZCIsCiAgImV4cGlyZXNPbkRhdGUiIDogMTc0NjM1MDU2Nwp9;
+    sign = "K7QcxRYpPeIYOUtSHqLr2jfzWKYKlphJen0xUwJLVqwM4Xr/DcDvEgQVyIgV8poF9RnhCg7eruw6wbXzMv9GSfSC/zKm4DUsjPsqtvr4X/+thfUyzVrAJgGUmIGSOR7dFrOvdhbx4h+hsiWR9oYVq+vQfp7xdkF1RD+72QVbhR8PJyBCxja34JklxvDKGDJmsc1FhbkTeXzEBNkSNhD58HRWajIxlAs6sckjbGV/DPrrV8cC3Rok3iytiMcp/KRqtaJYtZk/RMrvxnByszutZ8U9z5ve1mHMdO1BKEnUREtriVZ/kU0I07itV9tpDoJReL9pQiQk93L/WdO9mmtERA==";
+} sign
+
+objectForKeyedSubscript: called with key:  __NSDictionaryM {
+    BuildMachineOSBuild = 24A335;
+    CFBundleDevelopmentRegion = en;
+    CFBundleDisplayName = "Surge Network Extension";
+    CFBundleExecutable = "com.nssurge.surge-mac.ne";
+    CFBundleIdentifier = "com.nssurge.surge-mac.ne";
+    CFBundleInfoDictionaryVersion = "6.0";
+    CFBundleName = "com.nssurge.surge-mac.ne";
+    CFBundleNumericVersion = 1073774592;
+    CFBundlePackageType = SYSX;
+    CFBundleShortVersionString = "5.0";
+    CFBundleSupportedPlatforms =     (
+        MacOSX
+    );
+    CFBundleVersion = 40;
+    DTCompiler = "com.apple.compilers.llvm.clang.1_0";
+    DTPlatformBuild = 24A336;
+    DTPlatformName = macosx;
+    DTPlatformVersion = "15.0";
+    DTSDKBuild = 24A336;
+    DTSDKName = "macosx15.0";
+    DTXcode = 1600;
+    DTXcodeBuild = 16A242d;
+    LSMinimumSystemVersion = "12.0";
+    NSHumanReadableCopyright = "Copyright \U00a9 2024 Surge Networks Inc. All rights reserved.";
+    NSSystemExtensionUsageDescription = "Surge Enhanced Mode";
+    NetworkExtension =     {
+        NEMachServiceName = "YCKFLA6N72.group.com.nssurge.surge-mac";
+        NEProviderClasses =         {
+            "com.apple.networkextension.packet-tunnel" = PacketTunnelProvider;
+        };
+    };
+} CFBundleVersion
+
+
+objectForKeyedSubscript: called with key:  __NSDictionaryI {
+    deviceID = 16b8f4bdfd55d29f737427b4ec0c14d7;
+    expiresOnDate = 1746350567;
+    p = "QU1oHx8IbxU1PvQQ3340JA==";
+    product = SURGEMAC5;
+    type = licensed;
+} type
